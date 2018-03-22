@@ -1,18 +1,45 @@
 import React, { Component } from 'react';
-import { inject } from 'mobx-react';
-import { Payment } from './PaymentStore';
+import { inject, observer } from 'mobx-react';
+import { Form as BaseForm } from 'mobx-react-form';
+import validatorjs from 'validatorjs';
 
-@inject("PaymentStore")
-class PaymentForm extends Component {
-    constructor(props){
-        super(props);
-        this.handleInputChange = this.handleInputChange.bind(this);
+class Form extends BaseForm{
+    plugins() {
+        return { dvr: validatorjs };
     }
 
+    setup(){
+        return {
+            fields: [{
+                name: 'amount',
+                label: 'Amount',
+            }]
+        }
+    }
+
+    hooks(){
+        return {
+            onSuccess(form) {
+                alert('Form is valid! Send the request here.');
+                // get field values
+                console.log('Form Values!', form.values());
+            },
+            onError(form) {
+                alert('Form has errors!');
+                // get all form errors
+                console.log('All form errors', form.errors());
+            }
+        };
+    }
+}
+
+@inject("PaymentStore")
+@observer
+class PaymentForm extends Component {
     componentDidMount(){
         let id = this.props.match.params.paymentId;
 
-        if (id.match(/\d+/).length) {
+        if (id.match(/\d+/)) {
             // If id is numerical we assume we are editing an existing payment
             this.props.PaymentStore.getPayments(id);
         } else {
@@ -20,17 +47,10 @@ class PaymentForm extends Component {
         }
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-
-        // this.setState({
-            // [name]: value
-        // });
-    }
-
     render() {
+
+        const form = new Form();
+
         // let users = this.props.users.map((user) =>
         //     <option key={user.id} value={user.id}>{user.first_name}</option>
         // );
@@ -47,10 +67,11 @@ class PaymentForm extends Component {
             <div>
                 <h2>Payment Form</h2>
 
-                <form>
+                <form onSubmit={form.onSubmit}>
                     <label>
-                        Amount
-                        <input type="text" name="amount" value={ this.props.PaymentStore.payments[0].amount } onChange={this.handleInputChange} />
+                        {form.$('amount').label}
+                        <input {...form.$('amount').bind()} />
+                        <p>{form.$('amount').error}</p>
                     </label>
 
                     <label>

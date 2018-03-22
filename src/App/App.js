@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import { inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import PaymentContainer from '../Payment/PaymentContainer';
 import LoginForm from './LoginForm';
 
 @inject("SessionStore")
+@observer
 class App extends Component {
     render() {
         const grantAccess = this.props.SessionStore.hasSession();
