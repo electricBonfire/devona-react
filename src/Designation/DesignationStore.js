@@ -7,7 +7,7 @@ class DesignationStore {
     getDesignations = () => {
         axios.get('/designations')
             .then((response) => {
-                this.payments = response.data;
+                this.designations = response.data;
                 console.log(response);
             })
             .catch((error) => {

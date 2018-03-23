@@ -6,7 +6,7 @@ class ProjectStore {
 
     @action
     getProjects = () => {
-        axios.get('/payments')
+        axios.get('/projects')
             .then((response) => {
                 this.projects = response.data;
                 console.log(response);

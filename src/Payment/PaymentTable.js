@@ -21,13 +21,6 @@ class PaymentRow extends Component {
 @inject("PaymentStore")
 @observer
 class PaymentTable extends Component {
-    componentDidMount(){
-        this.props.PaymentStore.getPayments();
-        // this.props.DesignationStore.getDesignations();
-        // this.props.UserStore.getUsers();
-        // this.props.ProjectStore.getProjects();
-    }
-
     render() {
         const paymentRows = this.props.PaymentStore.payments.filter((payment) => {
             switch (this.props.PaymentStore.filter) {
@@ -43,9 +36,6 @@ class PaymentTable extends Component {
 
         return (
             <div>
-                <button onClick={ () => { this.props.PaymentStore.setFilter('Income') } }>Income</button>
-                <button onClick={ () => { this.props.PaymentStore.setFilter('Expenses') } }>Expenses</button>
-
                 <table>
                     <thead>
                         <tr>

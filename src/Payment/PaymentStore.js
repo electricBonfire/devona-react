@@ -2,11 +2,19 @@ import { observable, action } from 'mobx';
 import axios from "axios";
 
 class Payment {
-    id = 10;
-    amount = 10;
+    @observable amount = 0;
+    @observable date = new Date();
+    @observable user = {};
+    @observable notes = [];
+    @observable dinv = 0;
+    @observable relatedProject = {};
+    @observable category = {};
+    @observable hasCheckNumber = false;
+    @observable capitalized = false;
 }
 
 class PaymentStore {
+    @observable currentPayment = new Payment();
     @observable payments = [];
     @observable filter = "";
 
@@ -14,10 +22,13 @@ class PaymentStore {
     getPayments = (id = null) => {
         let endpoint = '/payments';
         endpoint += (id) ? '/' + id : '';
-
         axios.get(endpoint)
             .then((response) => {
-                this.payments = response.data;
+                if(id) {
+                    this.currentPayment = response.data;
+                } else {
+                    this.payments = response.data;
+                }
                 console.log('done: ', response);
             })
             .catch((error) => {
@@ -41,6 +52,11 @@ class PaymentStore {
     setFilter = (filter) => {
         console.log(filter);
         this.filter = filter;
+    }
+
+    @action
+    createNewPayment = () => {
+        this.currentPayment = new Payment();
     }
 }
 

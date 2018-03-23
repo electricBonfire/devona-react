@@ -1,132 +1,124 @@
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
-import { Form as BaseForm } from 'mobx-react-form';
-import validatorjs from 'validatorjs';
+import { inject, observer} from 'mobx-react';
+import { observable } from 'mobx';
 
-class Form extends BaseForm{
-    plugins() {
-        return { dvr: validatorjs };
-    }
+import { Payment } from './PaymentStore';
 
-    setup(){
-        return {
-            fields: [{
-                name: 'amount',
-                label: 'Amount',
-            }]
-        }
-    }
-
-    hooks(){
-        return {
-            onSuccess(form) {
-                alert('Form is valid! Send the request here.');
-                // get field values
-                console.log('Form Values!', form.values());
-            },
-            onError(form) {
-                alert('Form has errors!');
-                // get all form errors
-                console.log('All form errors', form.errors());
-            }
-        };
-    }
-}
-
-@inject("PaymentStore")
+@inject("PaymentStore", "UserStore", "ProjectStore", "DesignationStore")
 @observer
 class PaymentForm extends Component {
-    componentDidMount(){
-        let id = this.props.match.params.paymentId;
+    @observable id;
 
-        if (id.match(/\d+/)) {
-            // If id is numerical we assume we are editing an existing payment
-            this.props.PaymentStore.getPayments(id);
+    constructor(props){
+        super(props);
+        this.onChange = this.onChange.bind(this);
+    }
+
+    componentDidMount(){
+        this.id = this.props.match.params.paymentId.match(/\d+/);
+
+        // If id is numerical we assume we are editing an existing payment
+        if (this.id) {
+            this.props.PaymentStore.getPayments(this.id);
         } else {
-            this.props.PaymentStore.payments = [];
+            this.id = null;
+            this.props.PaymentStore.currentPayment = new Payment();
         }
+    }
+
+    onChange(event){
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.props.PaymentStore.currentPayment[name] =  value;
+    }
+
+    onSubmit(event){
+        debugger;
+        return false;
     }
 
     render() {
 
-        const form = new Form();
+        let users = this.props.UserStore.users.map((user) =>
+            <option key={user.id} value={user.id}>{user.first_name}</option>
+        );
 
-        // let users = this.props.users.map((user) =>
-        //     <option key={user.id} value={user.id}>{user.first_name}</option>
-        // );
-        //
-        // let projects = this.props.projects.map((project) =>
-        //     <option key={project.id} value={project.id}>{project.summary}</option>
-        // );
-        //
-        // let categories = this.props.categories.map((category) =>
-        //     <option key={category.id} value={category.id}>{category.name}</option>
-        // );
+        let projects = this.props.ProjectStore.projects.map((project) =>
+            <option key={project.id} value={project.id}>{project.summary}</option>
+        );
 
+        let categories = this.props.DesignationStore.designations.map((category) =>
+            <option key={category.id} value={category.id}>{category.name}</option>
+        );
         return (
             <div>
                 <h2>Payment Form</h2>
 
-                <form onSubmit={form.onSubmit}>
+                <form onSubmit={this.onSubmit}>
                     <label>
-                        {form.$('amount').label}
-                        <input {...form.$('amount').bind()} />
-                        <p>{form.$('amount').error}</p>
+                        <input name="amount" value={this.props.PaymentStore.currentPayment.amount } onChange={this.onChange}/>
+                        {/*{this.form.$('amount').label}*/}
+                        {/*<input {...this.form.$('amount').bind()} />*/}
+                        {/*<p>{this.form.$('amount').error}</p>*/}
                     </label>
 
                     <label>
                         Date
-                        {/*<input type="text" name="date" value={this.state.date} onChange={this.handleInputChange} />*/}
+                        <input type="text" name="date" value={ this.props.PaymentStore.currentPayment.date } onChange={this.onChange} />
                     </label>
 
                     <br />
 
                     <label>
                         From / To
-                        {/*<select name="from" value={this.state.value} onChange={this.handleInputChange} >*/}
-                            {/*/!*{users}*!/*/}
-                        {/*</select>*/}
+                        <select name="from" onChange={this.onChange} >
+                            {users}
+                        </select>
                     </label>
 
                     <br />
 
                     <label>
                         Notes
-                        {/*<textarea name="notes" value={this.state.value} onChange={this.handleInputChange} />*/}
+                        <textarea name="notes" value={this.props.PaymentStore.currentPayment.value } onChange={this.onChange} />
                     </label>
 
                     <br />
 
                     <label>
                         DINV
-                        {/*<input type="text" name="dinv" value={this.state.dinv} onChange={this.handleInputChange} />*/}
+                        <input type="text" name="dinv" value={this.props.PaymentStore.currentPayment.dinv} onChange={this.onChange} />
                     </label>
 
 
                     <label>
                         Related Project
-                        {/*<select name="relatedProject" value={this.state.relatedProject} onChange={this.handleInputChange} >*/}
-                            {/*/!*{projects}*!/*/}
-                        {/*</select>*/}
+                        <select name="relatedProject" onChange={this.onChange} >
+                            {projects}
+                        </select>
                     </label>
 
                     <label>
                         Category
-                        {/*<select name="category" value={this.state.category} onChange={this.handleInputChange} >*/}
-                            {/*/!*{categories}*!/*/}
-                        {/*</select>*/}
+                        <select name="category" onChange={this.onChange}>
+                            {categories}
+                        </select>
                     </label>
 
                     <br />
 
                     <label>
                         Assign Check Number
-                        {/*<input name="assignCheckNumber" type="checkbox" checked={this.state.assignCheckNumber} onChange={this.handleInputChange} />*/}
+                        <input name="assignCheckNumber" type="checkbox" checked={this.props.PaymentStore.currentPayment.assignCheckNumber} onChange={this.onChange} />
                     </label>
                     <label>
                         Capitalized
-                        {/*<input name="isCapitalized" type="checkbox" checked={this.state.isCapitalized} onChange={this.handleInputChange} />*/}
+                        <input name="capitalized" type="checkbox" checked={this.props.PaymentStore.currentPayment.capitalized} onChange={this.onChange} />
                     </label>
+
+                    <button>{ (this.id) ? "UPDATE" : "CREATE" }</button>
                 </form>
             </div>
         )
