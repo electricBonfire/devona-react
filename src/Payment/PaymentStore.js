@@ -73,7 +73,6 @@ class PaymentStore {
         let income = 0;
         this.payments.forEach((payment) => {
             if(payment.amount > 0) {
-                debugger;
                 income += payment.amount;
             }
         });
