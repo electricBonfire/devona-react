@@ -19,6 +19,13 @@ class PaymentContainer extends Component {
     render() {
         return (
             <div>
+                <h1>Income and Expenses</h1>
+
+                <h2>Income: { this.props.PaymentStore.income }</h2>
+                <h2>Expenses: { this.props.PaymentStore.expenses }</h2>
+                <h2>Cash Flow: { this.props.PaymentStore.cashflow }</h2>
+                <h2>Balance: </h2>
+
                 <Link to="/payments/new" onClick = { () => { this.props.PaymentStore.createNewPayment() } }>New</Link>
                 <Link to="/payments" onClick={ () => { this.props.PaymentStore.setFilter('Income') } }>Income</Link>
                 <Link to="/payments" onClick={ () => { this.props.PaymentStore.setFilter('Expenses') } }>Expenses</Link>

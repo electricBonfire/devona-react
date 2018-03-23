@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { inject, observer} from 'mobx-react';
 import { observable } from 'mobx';
 
-import { Payment } from './PaymentStore';
-
 @inject("PaymentStore", "UserStore", "ProjectStore", "DesignationStore")
 @observer
 class PaymentForm extends Component {
@@ -12,6 +10,7 @@ class PaymentForm extends Component {
     constructor(props){
         super(props);
         this.onChange = this.onChange.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
     }
 
     componentDidMount(){
@@ -19,10 +18,9 @@ class PaymentForm extends Component {
 
         // If id is numerical we assume we are editing an existing payment
         if (this.id) {
-            this.props.PaymentStore.getPayments(this.id);
+            this.props.PaymentStore.getPayment(this.id);
         } else {
-            this.id = null;
-            this.props.PaymentStore.currentPayment = new Payment();
+            this.props.PaymentStore.createNewPayment();
         }
     }
 
@@ -35,21 +33,21 @@ class PaymentForm extends Component {
     }
 
     onSubmit(event){
-        debugger;
-        return false;
+        this.props.PaymentStore.savePayment(this.props.PaymentStore.currentPayment);
+        event.preventDefault();
     }
 
     render() {
 
-        let users = this.props.UserStore.users.map((user) =>
+        const users = this.props.UserStore.users.map((user) =>
             <option key={user.id} value={user.id}>{user.first_name}</option>
         );
 
-        let projects = this.props.ProjectStore.projects.map((project) =>
+        const projects = this.props.ProjectStore.projects.map((project) =>
             <option key={project.id} value={project.id}>{project.summary}</option>
         );
 
-        let categories = this.props.DesignationStore.designations.map((category) =>
+        const categories = this.props.DesignationStore.designations.map((category) =>
             <option key={category.id} value={category.id}>{category.name}</option>
         );
         return (
@@ -59,9 +57,6 @@ class PaymentForm extends Component {
                 <form onSubmit={this.onSubmit}>
                     <label>
                         <input name="amount" value={this.props.PaymentStore.currentPayment.amount } onChange={this.onChange}/>
-                        {/*{this.form.$('amount').label}*/}
-                        {/*<input {...this.form.$('amount').bind()} />*/}
-                        {/*<p>{this.form.$('amount').error}</p>*/}
                     </label>
 
                     <label>

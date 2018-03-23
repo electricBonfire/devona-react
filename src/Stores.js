@@ -2,7 +2,7 @@ import PaymentStore from './Payment/PaymentStore';
 import DesignationStore from "./Designation/DesignationStore";
 import UserStore from "./User/UserStore";
 import ProjectStore from "./Project/ProjectStore";
-import SessionStore from "./App/SessionStore";
+import SessionStore from "./Session/SessionStore";
 
 const stores = {
     PaymentStore: new PaymentStore(),

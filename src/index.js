@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'mobx-react';
-import stores from "./Stores";
-import App from './App/App';
 import registerServiceWorker from './registerServiceWorker';
 import axios from "axios/index";
+import { Provider } from 'mobx-react';
 
-// axios.defaults.baseURL = 'http://localhost:8000/app.php';
-axios.defaults.baseURL = 'http://localhost:8000/app_dev.php';
+import stores from "./Stores";
+import App from './App/App';
+import { APIBaseURL } from './config.js';
+
+axios.defaults.baseURL = APIBaseURL;
 
 ReactDOM.render(<Provider { ...stores } ><App /></Provider>, document.getElementById('root'));
 registerServiceWorker();
